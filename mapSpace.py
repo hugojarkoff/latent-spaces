@@ -4,9 +4,44 @@ import numpy as np
 from PIL import Image, ImageTk
 import keras
 import matplotlib.pyplot as plt
+from itertools import product
 
 # Assuming 'decoder.h5' is the correct path to the model
 model = keras.models.load_model('decoder.h5')
+classifier_preds = np.load('classifier_preds.npy')
+
+# Define a discrete color map with 10 distinct colors for each class
+color_map = {
+    0: 'red',
+    1: 'blue',
+    2: 'green',
+    3: 'purple',
+    4: 'orange',
+    5: 'cyan',
+    6: 'magenta',
+    7: 'yellow',
+    8: 'lime',
+    9: 'brown',
+}
+
+# Create a mapping of class labels to text labels
+class_labels = {
+    0: 'T-shirt/top',
+    1: 'Trouser',
+    2: 'Pullover',
+    3: 'Dress',
+    4: 'Coat',
+    5: 'Sandal',
+    6: 'Shirt',
+    7: 'Sneaker',
+    8: 'Bag',
+    9: 'Ankle boot',
+}
+
+# Map the labels to their corresponding colors
+colors = [color_map[label] for label in classifier_preds]
+
+
 
 def predict_image(x, y):
     # Scale the coordinates to the range [0, 1]
@@ -23,6 +58,7 @@ def predict_image(x, y):
     return predicted_image
 
 def update_image(x, y):
+
     predicted_image = predict_image(x, y)
 
     # Create an ImageTk object from the grayscale image
@@ -34,6 +70,10 @@ def update_image(x, y):
     photo = ImageTk.PhotoImage(image)
     image_label.configure(image=photo)
     image_label.image = photo
+
+    # # Display the label in the legend based on the color of the predicted image
+    # class_label = class_labels[classifier_preds[x * 500 + y]]
+    # # legend_label.configure(text=f'Predicted Class: {class_label}')
 
 def on_hover(event):
     x, y = event.x, event.y  # Use the raw hover coordinates
@@ -51,14 +91,15 @@ if __name__ == "__main__":
     # Create the canvas for the grid (displaying 700x700 points on a 500x500 canvas)
     canvas = Canvas(frame, width=500, height=500, bg="white", scrollregion=(0, 0, 500, 500))
     canvas.pack(side=tk.LEFT)
+    
 
-    # Draw the grid of points
-    grid_spacing = 500 // 500
-    for i in range(500):
-        for j in range(500):
-            if i % grid_spacing == 0 and j % grid_spacing == 0:
-                # canvas.create_rectangle(i // grid_spacing, j // grid_spacing, (i // grid_spacing) + 1, (j // grid_spacing) + 1, fill="gray")
-                canvas.create_text(i // grid_spacing, j // grid_spacing, text=".", font=("Helvetica", 1), fill="white")
+    # Calculate the width and height of each rectangle
+    rect_width = 1
+    rect_height = 1
+
+    for i, (x,y) in enumerate(product(np.arange(500), np.arange(500))) : 
+        color = colors[i]
+        canvas.create_rectangle(x * rect_width, y * rect_height, (x + 1) * rect_width, (y + 1) * rect_height, fill=color, outline='')
 
     # Create a label for the predicted image
     default_image = Image.new("RGB", (300, 300), color="white")  # Change the default image size to 300x300
@@ -67,6 +108,30 @@ if __name__ == "__main__":
     image_label.image = default_photo
     image_label.pack(side=tk.LEFT)
 
+    # # Create a label for the legend
+    # # NOTE : Updating labels in real time is quite slow ...
+    # legend_label = tk.Label(frame, text='Predicted Class:', font=('Helvetica', 14), pady=10)
+    # legend_label.pack(side=tk.BOTTOM)
+
+
+    # Create a label for the legend
+    legend_frame = tk.Frame(frame)
+    legend_frame.pack(side=tk.LEFT)
+
+    legend_label = tk.Label(legend_frame, text='Legend:', font=('Helvetica', 14))
+    legend_label.pack()
+
+    # Create a canvas to display the color rectangles with their corresponding labels
+    legend_canvas = tk.Canvas(legend_frame, width=150, height=300, bg="white")
+    legend_canvas.pack()
+
+    # Draw color rectangles with labels on the legend canvas
+    rect_height = 30
+    for i, label in class_labels.items():
+        color = color_map[i]
+        legend_canvas.create_rectangle(10, i * rect_height + 10, 40, (i + 1) * rect_height, fill=color)
+        legend_canvas.create_text(60, (i + 0.5) * rect_height, text=label, anchor=tk.W)
+        
     # Bind the motion (hover) event to the canvas
     canvas.bind("<Motion>", on_hover)
 
