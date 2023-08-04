@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from itertools import product
 
 # Assuming 'decoder.h5' is the correct path to the model
-model = keras.models.load_model('decoder.h5')
+model = keras.models.load_model('best_decoder.h5')
 classifier_preds = np.load('classifier_preds.npy')
 
 # Define a discrete color map with 10 distinct colors for each class
@@ -71,9 +71,6 @@ def update_image(x, y):
     image_label.configure(image=photo)
     image_label.image = photo
 
-    # # Display the label in the legend based on the color of the predicted image
-    # class_label = class_labels[classifier_preds[x * 500 + y]]
-    # # legend_label.configure(text=f'Predicted Class: {class_label}')
 
 def on_hover(event):
     x, y = event.x, event.y  # Use the raw hover coordinates
@@ -107,12 +104,6 @@ if __name__ == "__main__":
     image_label = tk.Label(frame, image=default_photo)
     image_label.image = default_photo
     image_label.pack(side=tk.LEFT)
-
-    # # Create a label for the legend
-    # # NOTE : Updating labels in real time is quite slow ...
-    # legend_label = tk.Label(frame, text='Predicted Class:', font=('Helvetica', 14), pady=10)
-    # legend_label.pack(side=tk.BOTTOM)
-
 
     # Create a label for the legend
     legend_frame = tk.Frame(frame)
