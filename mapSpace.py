@@ -3,10 +3,9 @@ from tkinter import Canvas
 import numpy as np
 from PIL import Image, ImageTk
 import keras
-import matplotlib.pyplot as plt
 from itertools import product
 
-# Assuming 'decoder.h5' is the correct path to the model
+# Load useful artifacts
 model = keras.models.load_model('best_decoder.h5')
 classifier_preds = np.load('classifier_preds.npy')
 
@@ -41,15 +40,12 @@ class_labels = {
 # Map the labels to their corresponding colors
 colors = [color_map[label] for label in classifier_preds]
 
-
-
 def predict_image(x, y):
     # Scale the coordinates to the range [0, 1]
     x_norm = x / 500
     y_norm = y / 500
 
-    # Replace this with your DNN model prediction function
-    # Assuming model.predict() returns a 2D array of shape (28, 28) for grayscale images
+    # model.predict() returns a 2D array of shape (None, 28, 28, 1) for grayscale images
     predicted_image = model.predict([[x_norm, y_norm]])[0, :, :, 0]
 
     # Convert the predicted image from the range [0, 1] to the range [0, 255]
@@ -59,6 +55,7 @@ def predict_image(x, y):
 
 def update_image(x, y):
 
+    # Get the predicted image from the coordinates
     predicted_image = predict_image(x, y)
 
     # Create an ImageTk object from the grayscale image
@@ -85,7 +82,7 @@ if __name__ == "__main__":
     frame = tk.Frame(root)
     frame.pack()
 
-    # Create the canvas for the grid (displaying 700x700 points on a 500x500 canvas)
+    # Create the canvas for the grid
     canvas = Canvas(frame, width=500, height=500, bg="white", scrollregion=(0, 0, 500, 500))
     canvas.pack(side=tk.LEFT)
     
