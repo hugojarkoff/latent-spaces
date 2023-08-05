@@ -1,7 +1,7 @@
 let model;
 
 async function main() {
-    model = await tf.loadLayersModel('tjfs_decoder/model.json');
+    model = await tf.loadLayersModel('training/tf_js/decoder/model.json');
     console.log("Model loaded");
     console.log("Model summary:");
     model.summary();
