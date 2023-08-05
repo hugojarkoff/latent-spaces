@@ -6,8 +6,8 @@ import keras
 from itertools import product
 
 # Load useful artifacts
-model = keras.models.load_model('best_decoder.h5')
-classifier_preds = np.load('classifier_preds.npy')
+model = keras.models.load_model('training/saved_models/best_decoder.h5')
+classifier_preds = np.load('artifacts/classifier_preds.npy')
 
 # Define a discrete color map with 10 distinct colors for each class
 color_map = {
