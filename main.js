@@ -6,8 +6,8 @@ async function main() {
     console.log("Model summary:");
     model.summary();
 }
-let x = 0;
-let y = 0;
+let x = 0.25;
+let y = 0.25;
 const colors = [
     [255, 0, 0],    // 'red'
     [0, 0, 255],    // 'blue'
